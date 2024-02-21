@@ -1,0 +1,46 @@
+spring:
+  profiles:
+    active: local
+  devtools:
+    restart:
+      enabled: true
+  thymeleaf:
+    prefix: classpath:/templates/
+    suffix: .html
+  datasource:
+    url: ${DB_URL}
+    username: ${DB_USERNAME}
+    password: ${DB_PASSWORD}
+    driver-class-name: ${DB_DRIVER}
+  jpa:
+    hibernate:
+      ddl-auto: update
+    properties:
+      dialect: org.hibernate.dialect.MySQL8InnoDBDialect
+      hibernate:
+      # show_sql: true
+      format_sql: true
+  servlet:
+    multipart:
+      max-file-size: 500MB
+      max-request-size: 500MB
+
+
+logging:
+  level:
+    org.hibernate.SQL: info
+    org.hibernate.type: trace
+servlet:
+  multipart:
+    enabled: true
+    maxFileSize: 1000MB
+    maxRequestSize: 1000MB
+springdoc:
+  swagger-ui:
+    tags-sorter: alpha            # alpha: ??? ? ?? ??, method: HTTP Method ? ??
+    operations-sorter: alpha
+
+
+jwt:
+  token:
+    secret: ${JWT_TOKEN_SECRET}
