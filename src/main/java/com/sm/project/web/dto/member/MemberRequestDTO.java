@@ -1,6 +1,8 @@
 package com.sm.project.web.dto.member;
 
+import lombok.AllArgsConstructor;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 public class MemberRequestDTO {
@@ -9,5 +11,13 @@ public class MemberRequestDTO {
     @Setter
     public static class IssueTokenDTO {
         String refreshToken;
+    }
+
+    @Getter
+    @NoArgsConstructor
+    @AllArgsConstructor
+    public static class LoginDTO {
+        private String email;
+        private String password;
     }
 }

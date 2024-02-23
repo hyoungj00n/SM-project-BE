@@ -17,6 +17,8 @@ public enum ErrorStatus implements BaseErrorCode {
 
     //Member
     MEMBER_NOT_FOUND(HttpStatus.NOT_FOUND, "MEMBER4001", "해당 회원을 찾을 수 없습니다."),
+    MEMBER_EMAIL_NOT_FOUND(HttpStatus.NOT_FOUND, "MEMBER4002", "해당 이메일이 존재하지 않습니다."),
+    MEMBER_PASSWORD_ERROR(HttpStatus.NOT_FOUND, "MEMBER4003", "비밀번호가 틀렸습니다."),
 
 
     //JWT
