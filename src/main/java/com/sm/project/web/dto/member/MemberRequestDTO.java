@@ -31,7 +31,7 @@ public class MemberRequestDTO {
 
         @NotBlank(message = "전화번호는 필수 입력값입니다.")
         String phone;
-        
+
         Boolean infoAgree;
         Boolean messageAgree;
     }

@@ -15,4 +15,12 @@ public class MemberResponseDTO {
     public static class JoinResultDTO {
         Long memberId;
     }
+
+    @Getter
+    @Builder
+    @NoArgsConstructor
+    @AllArgsConstructor
+    public static class EmailResultDTO {
+        String email;
+    }
 }
