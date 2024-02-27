@@ -34,4 +34,12 @@ public class MemberController {
         return ResponseDTO.onSuccess(memberService.login(request));
     }
 
+
+    @GetMapping("/callback/kakao")
+    public ResponseDTO<?> getKakaoAccount(@RequestParam("code") String code) {
+
+        return memberService.getKakaoInfo(code);
+
+    }
+
 }

@@ -1,9 +1,6 @@
 package com.sm.project.web.dto.member;
 
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 
 public class MemberRequestDTO {
 
@@ -20,4 +17,6 @@ public class MemberRequestDTO {
         private String email;
         private String password;
     }
+
+
 }
