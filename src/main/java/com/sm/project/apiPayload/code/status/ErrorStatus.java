@@ -17,6 +17,8 @@ public enum ErrorStatus implements BaseErrorCode {
 
     //Member
     MEMBER_NOT_FOUND(HttpStatus.NOT_FOUND, "MEMBER4001", "해당 회원을 찾을 수 없습니다."),
+    MEMBER_EMAIL_NOT_FOUND(HttpStatus.NOT_FOUND, "MEMBER4002", "해당 이메일이 존재하지 않습니다."),
+    MEMBER_PASSWORD_ERROR(HttpStatus.NOT_FOUND, "MEMBER4003", "비밀번호가 틀렸습니다."),
 
 
     //JWT
@@ -26,6 +28,9 @@ public enum ErrorStatus implements BaseErrorCode {
     JWT_REFRESH_TOKEN_EXPIRED(HttpStatus.UNAUTHORIZED, "JWT4003","리프레시 토큰이 만료되었습니다. 다시 로그인하시기 바랍니다."),
     JWT_UNSUPPORTED_TOKEN(HttpStatus.UNAUTHORIZED, "JWT4004","지원하지 않는 JWT 토큰입니다."),
     JWT_TOKEN_NOT_FOUND(HttpStatus.UNAUTHORIZED, "JWT4005","유효한 JWT 토큰이 없습니다."),
+
+    //FeignClient
+    FEIGN_CLIENT_ERROR(HttpStatus.INTERNAL_SERVER_ERROR, "5001", "Inter server Error in feign client"),
     ;
 
 

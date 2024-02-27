@@ -14,13 +14,14 @@ import com.sm.project.web.dto.member.MemberRequestDTO;
 import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
+import java.util.Arrays;
 import java.util.Optional;
-import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
@@ -41,7 +42,7 @@ public class RedisServiceImpl implements RedisService {
     @Transactional
     public RefreshToken generateRefreshToken(String email) {
         Member member = memberRepository.findByEmail(email).orElseThrow(() -> new MemberHandler(ErrorStatus.MEMBER_NOT_FOUND));
-        String token = UUID.randomUUID().toString();
+        String token = tokenProvider.createRefreshToken(Arrays.asList(new SimpleGrantedAuthority("USER")));
         Long memberId = member.getId();
 
         LocalDateTime currentTime = LocalDateTime.now();

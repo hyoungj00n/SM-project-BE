@@ -1,6 +1,6 @@
 package com.sm.project.config.springSecurity.Handler;
 
-import com.sm.project.apiPayload.ApiResponse;
+import com.sm.project.apiPayload.ResponseDTO;
 import com.sm.project.apiPayload.code.status.ErrorStatus;
 import com.sm.project.apiPayload.exception.handler.JwtHandler;
 import lombok.RequiredArgsConstructor;
@@ -28,7 +28,7 @@ public class JwtAuthenticationExceptionHandler extends OncePerRequestFilter {
             response.setStatus(HttpStatus.UNAUTHORIZED.value());
 
             PrintWriter writer = response.getWriter();
-            ApiResponse apiErrorResult = ApiResponse.onFailure(ErrorStatus.JWT_BAD_REQUEST.getCode(), ErrorStatus.JWT_BAD_REQUEST.getMessage(), "");
+            ResponseDTO apiErrorResult = ResponseDTO.onFailure(ErrorStatus.JWT_BAD_REQUEST.getCode(), ErrorStatus.JWT_BAD_REQUEST.getMessage(), "");
 
             writer.write(apiErrorResult.toString());
             writer.flush();
