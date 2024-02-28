@@ -18,4 +18,14 @@ public class FoodRequestDTO {
         Integer count;
         FoodType foodType;
     }
+
+    @Getter
+    @NoArgsConstructor
+    @AllArgsConstructor
+    public static class UpdateFoodDTO {
+        String name;
+        Date expire;
+        Integer count;
+        FoodType foodType;
+    }
 }

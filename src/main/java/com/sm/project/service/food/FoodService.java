@@ -20,12 +20,12 @@ public class FoodService {
 
     private final FoodRepository foodRepository;
 
-    public Food uploadFood(FoodRequestDTO.UploadFoodDTO request, Member member, Integer refrigeratorId){
+    public void uploadFood(FoodRequestDTO.UploadFoodDTO request, Member member, Integer refrigeratorId){
 
 
         Food newFood = FoodConverter.toFoodDTO(request, member, refrigeratorId);
         foodRepository.save(newFood);
-        return newFood;
+        return;
     }
 
     public List<Food> getFoodList(Member member, Integer refigeratorId){
@@ -33,6 +33,19 @@ public class FoodService {
         List<Food> foodList = foodRepository.findAllByMemberAndRefrigeratorId(member,refigeratorId);
 
         return foodList;
+    }
+
+    public void updateFood(FoodRequestDTO.UpdateFoodDTO request, Member member, Integer refrigeratorId, Long foodId){
+
+        foodRepository.changeFood(request.getName(),request.getCount(),request.getExpire(),request.getFoodType(),member,refrigeratorId,foodId);
+        return;
+    }
+
+    public void deleteFood(Member member, Integer refrigeratorId, Long foodId){
+
+        Food deleteFood = foodRepository.findByMemberAndIdAndRefrigeratorId(member, foodId, refrigeratorId);
+        foodRepository.delete(deleteFood);
+        return;
     }
 
 }

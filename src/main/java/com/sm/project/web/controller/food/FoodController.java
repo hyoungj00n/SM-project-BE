@@ -2,6 +2,7 @@ package com.sm.project.web.controller.food;
 
 import com.sm.project.apiPayload.ResponseDTO;
 import com.sm.project.apiPayload.code.status.ErrorStatus;
+import com.sm.project.apiPayload.code.status.SuccessStatus;
 import com.sm.project.apiPayload.exception.handler.MemberHandler;
 import com.sm.project.converter.food.FoodConverter;
 import com.sm.project.domain.food.Food;
@@ -34,14 +35,14 @@ public class FoodController {
 
     @PostMapping("/food/{refrigeratorId}")
     @Operation(summary = "음식 추가 API", description = "request: String 음식이름, 유통기한(2024-01-01), Integer 개수, 음식종류(COLD, FROZEN, OUTSIDE) ")
-    public ResponseDTO<FoodResponseDTO.UploadFoodResultDTO> uploadFood(@RequestBody FoodRequestDTO.UploadFoodDTO request,
+    public ResponseDTO<?> uploadFood(@RequestBody FoodRequestDTO.UploadFoodDTO request,
                                                                        @PathVariable(name = "refrigeratorId") Integer refrigeratorId,
                                                                        Authentication authentication){
 
         Member member = memberQueryService.findMemberById(Long.valueOf(authentication.getName().toString())).orElseThrow(() -> new MemberHandler(ErrorStatus.MEMBER_NOT_FOUND));
-        Food food = foodService.uploadFood(request, member, refrigeratorId);
+        foodService.uploadFood(request, member, refrigeratorId);
 
-        return ResponseDTO.onSuccess(FoodConverter.toUploadFoodResultDTO(food));
+        return ResponseDTO.of(SuccessStatus.FOOD_UPLOAD_SUCCESS,null);
 
     }
 
@@ -53,6 +54,30 @@ public class FoodController {
         Member member = memberQueryService.findMemberById(Long.valueOf(authentication.getName().toString())).orElseThrow(() -> new MemberHandler(ErrorStatus.MEMBER_NOT_FOUND));
         List<Food> foodList = foodService.getFoodList(member,refrigeratorId);
 
-        return ResponseDTO.onSuccess(FoodConverter.toGetFoodListResultDTO(foodList));
+        return ResponseDTO.of(SuccessStatus.FOOD_GET_SUCCESS,FoodConverter.toGetFoodListResultDTO(foodList));
+    }
+
+    @PutMapping("/food/{refrigeratorId}/{foodId}")
+    @Operation(summary = "음식 수정 api", description = "냉장고 번호와 음식 번호 request param으로 담고 request body에 수정해서 사용하면 수정됩니다.")
+    public ResponseDTO<?> updateFood(@RequestBody FoodRequestDTO.UpdateFoodDTO request,
+                                                                        @PathVariable(name = "refrigeratorId") Integer refrigeratorId,
+                                                                       @PathVariable(name = "foodId") Long foodId,
+                                                                       Authentication authentication){
+
+        Member member = memberQueryService.findMemberById(Long.valueOf(authentication.getName().toString())).orElseThrow(() -> new MemberHandler(ErrorStatus.MEMBER_NOT_FOUND));
+        foodService.updateFood(request,member,refrigeratorId,foodId);
+        return ResponseDTO.of(SuccessStatus.FOOD_UPDATE_SUCCESS, null);
+    }
+
+    @DeleteMapping("/food/{refrigeratorId}/{foodId}")
+    @Operation(summary = "음식 삭제 api", description = "냉장고 번호와 음식 번호 request param으로 담아서 사용하면 삭제됩니다.")
+    public ResponseDTO<?> deleteFood(@PathVariable(name = "refrigeratorId") Integer refrigeratorId,
+                                                                       @PathVariable(name = "foodId") Long foodId,
+                                                                       Authentication authentication){
+
+        Member member = memberQueryService.findMemberById(Long.valueOf(authentication.getName().toString())).orElseThrow(() -> new MemberHandler(ErrorStatus.MEMBER_NOT_FOUND));
+        foodService.deleteFood(member,refrigeratorId,foodId);
+
+        return ResponseDTO.of(SuccessStatus.FOOD_DELETE_SUCCESS,null);
     }
 }

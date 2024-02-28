@@ -22,12 +22,6 @@ public class FoodConverter {
                 .build();
     }
 
-    public static FoodResponseDTO.UploadFoodResultDTO toUploadFoodResultDTO(Food food){
-
-        return FoodResponseDTO.UploadFoodResultDTO.builder()
-                .name(food.getName())
-                .count(food.getCount()).build();
-    }
 
     public static FoodResponseDTO.FoodListDTO toGetFoodListResultDTO(List<Food> foodList){
         List<FoodResponseDTO.FoodDTO> foodListDTO = foodList.stream().map(food -> FoodResponseDTO.FoodDTO.builder()
@@ -40,4 +34,7 @@ public class FoodConverter {
                 .foodList(foodListDTO)
                 .build();
     }
+
+
+
 }

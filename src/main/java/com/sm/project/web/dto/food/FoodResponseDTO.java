@@ -8,14 +8,7 @@ import java.util.List;
 
 public class FoodResponseDTO {
 
-    @Builder
-    @Getter
-    @AllArgsConstructor(access = AccessLevel.PROTECTED)
-    @NoArgsConstructor(access = AccessLevel.PROTECTED)
-    public static class UploadFoodResultDTO {
-        String name;
-        Integer count;
-    }
+
 
     @Builder
     @Getter
@@ -35,4 +28,6 @@ public class FoodResponseDTO {
     public static class FoodListDTO {
         List<FoodDTO> foodList;
     }
+
+
 }
