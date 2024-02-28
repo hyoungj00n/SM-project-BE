@@ -20,6 +20,8 @@ public class Food extends BaseDateTimeEntity {
     @Column(name = "food_id")
     private Long id;
 
+    private Integer refrigeratorId;
+
     @Column(nullable = false, columnDefinition = "VARCHAR(20)")
     private String name;
 
@@ -33,6 +35,7 @@ public class Food extends BaseDateTimeEntity {
     @Enumerated(EnumType.STRING)
     private FoodType foodType;
 
+    
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "member_id")
     private Member member;
