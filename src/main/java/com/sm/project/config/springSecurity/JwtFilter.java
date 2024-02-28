@@ -31,6 +31,7 @@ public class JwtFilter extends OncePerRequestFilter {
 
         HttpServletRequest httpServletRequest = request;
         String jwt = tokenProvider.resolveToken(httpServletRequest);
+        System.out.println(jwt);
         if (StringUtils.hasText(jwt) && tokenProvider.validateToken(jwt, TokenProvider.TokenType.ACCESS)){
 
             // jwt는 정상적인 형태이나, 로그아웃 한 토큰인가?

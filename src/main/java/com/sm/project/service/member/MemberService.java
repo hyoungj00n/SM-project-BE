@@ -56,7 +56,6 @@ public class MemberService {
                 .orElseThrow(() -> new MemberHandler(ErrorStatus.MEMBER_EMAIL_NOT_FOUND));
 
         MemberPassword memberPassword = memberPasswordRepository.findByMember(selectedMember);
-        System.out.println(memberPassword.getPassword());
         //password 틀림
         if (!encoder.matches(request.getPassword(), memberPassword.getPassword())) {
             throw new MemberHandler(ErrorStatus.MEMBER_PASSWORD_ERROR);
