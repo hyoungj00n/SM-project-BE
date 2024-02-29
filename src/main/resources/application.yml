@@ -44,3 +44,9 @@ springdoc:
 jwt:
   token:
     secret: ${JWT_TOKEN_SECRET}
+
+coolsms:
+  api:
+    key: ${API_KEY}
+    secret: ${API_SECRET}
+  senderNumber: ${SENDER_NUMBER}

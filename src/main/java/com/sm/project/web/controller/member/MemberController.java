@@ -2,7 +2,9 @@ package com.sm.project.web.controller.member;
 
 import com.sm.project.apiPayload.ApiResponse;
 import com.sm.project.apiPayload.code.ErrorReasonDTO;
+import com.sm.project.apiPayload.code.status.ErrorStatus;
 import com.sm.project.apiPayload.code.status.SuccessStatus;
+import com.sm.project.apiPayload.exception.handler.MemberHandler;
 import com.sm.project.converter.member.MemberConverter;
 import com.sm.project.domain.member.Member;
 import com.sm.project.service.member.MemberCommandService;
@@ -68,4 +70,13 @@ public class MemberController {
         Member member = memberQueryService.findEmail(nickname, phone);
         return ApiResponse.of(SuccessStatus._OK, MemberConverter.toEmailResultDTO(member));
     }
+
+    @PostMapping("/send")
+    @Operation(summary = "본인인증 문자 전송 API", description = "본인인증을 위한 인증번호 문자를 보내는 API입니다.")
+    public ApiResponse sendSMS(@RequestBody MemberRequestDTO.SmsDTO smsDTO) {
+        memberCommandService.sendSms(smsDTO);
+        return ApiResponse.onSuccess("인증문자 전송 성공");
+    }
+
+
 }

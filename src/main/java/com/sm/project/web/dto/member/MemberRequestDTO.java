@@ -35,4 +35,9 @@ public class MemberRequestDTO {
         Boolean infoAgree;
         Boolean messageAgree;
     }
+
+    @Getter
+    public static class SmsDTO {
+        private String phone;
+    }
 }
