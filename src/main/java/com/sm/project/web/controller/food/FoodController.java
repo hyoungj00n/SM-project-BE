@@ -7,6 +7,7 @@ import com.sm.project.apiPayload.exception.handler.MemberHandler;
 import com.sm.project.converter.food.FoodConverter;
 import com.sm.project.domain.food.Food;
 import com.sm.project.domain.member.Member;
+import com.sm.project.feignClient.dto.NaverOCRResponse;
 import com.sm.project.service.food.FoodService;
 import com.sm.project.service.member.MemberQueryService;
 import com.sm.project.web.dto.food.FoodRequestDTO;
@@ -87,7 +88,12 @@ public class FoodController {
     public ResponseDTO<?> uploadReceipt(@RequestParam("receipt") MultipartFile receipt, Authentication authentication){
 
         Member member = memberQueryService.findMemberById(Long.valueOf(authentication.getName().toString())).orElseThrow(() -> new MemberHandler(ErrorStatus.MEMBER_NOT_FOUND));
-        foodService.uploadReceipt(member,receipt);
-        return ResponseDTO.of(SuccessStatus.RECEIPT_UPLOAD_SUCCESS, null);
+        String receiptUrl = foodService.uploadReceipt(member,receipt);
+
+        NaverOCRResponse naverOCRResponse = foodService.uploadReceiptData(receiptUrl);
+
+        return ResponseDTO.of(SuccessStatus.RECEIPT_UPLOAD_SUCCESS, naverOCRResponse);
     }
+
+
 }

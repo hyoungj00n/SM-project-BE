@@ -50,6 +50,7 @@ logging:
   level:
     org.hibernate.SQL: info
     org.hibernate.type: trace
+    com.sm.project.feignClient.naver.NaverOCRFeignClient: DEBUG
 servlet:
   multipart:
     enabled: true
@@ -73,13 +74,22 @@ oauth2:
     client-id: ${KAKAO_CLIENT_ID}
     redirect-uri: ${KAKAO_REDIRECT_URI}
 
+naver:
+  ocr:
+    secret: ${NAVER_OCR_SECRET}
+    url: ${NAVER_OCR_URL}
+    template: ${NAVER_OCR_TEMPLATE}
+
 feign:
   client:
     config:
       default:
         connectTimeout: 5000
         readTimeout: 5000
-        loggerLevel: basic
+        loggerLevel: FULL
+
+
+
 
 coolsms:
   api:

@@ -4,6 +4,8 @@ import com.sm.project.converter.food.FoodConverter;
 import com.sm.project.domain.food.Food;
 import com.sm.project.domain.image.ReceiptImage;
 import com.sm.project.domain.member.Member;
+import com.sm.project.feignClient.dto.NaverOCRResponse;
+import com.sm.project.feignClient.naver.NaverOCRFeignClient;
 import com.sm.project.repository.food.FoodRepository;
 import com.sm.project.repository.food.ReceiptImageRepository;
 import com.sm.project.service.UtilService;
@@ -25,6 +27,7 @@ public class FoodService {
     private final FoodRepository foodRepository;
     private final ReceiptImageRepository receiptImageRepository;
     private final UtilService utilService;
+    private final NaverOCRFeignClient naverOCRFeignClient;
 
     public void uploadFood(FoodRequestDTO.UploadFoodDTO request, Member member, Integer refrigeratorId){
 
@@ -54,7 +57,7 @@ public class FoodService {
         return;
     }
 
-    public void uploadReceipt(Member member, MultipartFile receipt){
+    public String uploadReceipt(Member member, MultipartFile receipt){
 
         String receiptUrl = utilService.uploadS3Img("receipt", receipt);
         ReceiptImage receiptImage = ReceiptImage.builder()
@@ -62,6 +65,16 @@ public class FoodService {
                 .member(member)
                 .build();
         receiptImageRepository.save(receiptImage);
+        return receiptUrl;
+    }
+
+    @Transactional
+    public NaverOCRResponse uploadReceiptData(String receiptUrl){
+
+
+        NaverOCRResponse naverOCRResponse = naverOCRFeignClient.generateText(FoodConverter.toNaverOCRRequestDTO(receiptUrl));
+
+        return naverOCRResponse;
     }
 
 }
