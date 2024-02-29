@@ -1,7 +1,6 @@
 package com.sm.project.web.dto.member;
 
-import lombok.Getter;
-import lombok.Setter;
+import lombok.*;
 
 import javax.validation.constraints.Email;
 import javax.validation.constraints.NotBlank;
@@ -14,6 +13,14 @@ public class MemberRequestDTO {
     @Setter
     public static class IssueTokenDTO {
         String refreshToken;
+    }
+
+    @Getter
+    @NoArgsConstructor
+    @AllArgsConstructor
+    public static class LoginDTO {
+        private String email;
+        private String password;
     }
 
     @Getter

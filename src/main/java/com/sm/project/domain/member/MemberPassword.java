@@ -17,10 +17,10 @@ public class MemberPassword extends BaseDateTimeEntity {
     @Column(name = "member_password_id")
     private Long id;
 
-    @Column(nullable = false, columnDefinition = "VARCHAR(255)")
+    @Column(columnDefinition = "TEXT")
     private String password;
 
-    @OneToOne
+    @OneToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "member_id")
     private Member member;
 }

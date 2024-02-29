@@ -2,6 +2,7 @@ package com.sm.project.config.springSecurity;
 
 import com.sm.project.apiPayload.code.status.ErrorStatus;
 import com.sm.project.apiPayload.exception.handler.JwtHandler;
+import com.sm.project.domain.enums.JoinType;
 import io.jsonwebtoken.*;
 import io.jsonwebtoken.security.Keys;
 import lombok.extern.slf4j.Slf4j;
@@ -57,7 +58,7 @@ public class TokenProvider implements InitializingBean {
     }
 
 
-    public String createAccessToken(Long memberId, String memberRole, String email, Collection<? extends GrantedAuthority> authorities) {
+    public String createAccessToken(Long memberId, JoinType joinType, String email, Collection<? extends GrantedAuthority> authorities) {
         //30분
 
         long now = (new Date()).getTime();
@@ -68,8 +69,9 @@ public class TokenProvider implements InitializingBean {
         return Jwts.builder()
                 .setSubject(String.valueOf(memberId))
                 .claim(AUTHORITIES_KEY, authorities)
-                .claim("memberRole", memberRole)
+                .claim("joinType", joinType)
                 .claim("email", email)
+                .claim("type",TokenType.ACCESS)
                 .signWith(key, SignatureAlgorithm.HS512)
                 .setExpiration(validity)
                 .compact();
@@ -87,6 +89,7 @@ public class TokenProvider implements InitializingBean {
 
         return Jwts.builder()
                 .claim(AUTHORITIES_KEY, authorities)
+                .claim("type",TokenType.REFRESH)
                 .signWith(key, SignatureAlgorithm.HS512)
                 .setExpiration(validity)
                 .compact();

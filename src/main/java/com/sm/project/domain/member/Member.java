@@ -2,21 +2,21 @@ package com.sm.project.domain.member;
 
 
 import com.sm.project.domain.Common.BaseDateTimeEntity;
+import com.sm.project.domain.enums.JoinType;
+import com.sm.project.domain.enums.StatusType;
+import com.sm.project.domain.food.Food;
 import lombok.*;
 import org.hibernate.annotations.ColumnDefault;
-import org.hibernate.annotations.DynamicInsert;
-import org.hibernate.annotations.DynamicUpdate;
 
 import javax.persistence.*;
-import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity
 @Getter
 @Builder
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor
-@DynamicInsert
-@DynamicUpdate
 public class Member extends BaseDateTimeEntity {
 
     @Id
@@ -33,13 +33,31 @@ public class Member extends BaseDateTimeEntity {
     @Column(nullable = false, columnDefinition = "VARCHAR(13)")
     private String phone;
 
-    private Boolean infoAgree;
-
-    private Boolean messageAgree;
-
-    @ColumnDefault("'ACTIVE'")
-    private String status;
-
     @Enumerated(EnumType.STRING)
     private JoinType joinType;
+
+    @Column(columnDefinition = "BOOLEAN")
+    @ColumnDefault("false")
+    private Boolean infoAgree;
+
+    @Column(columnDefinition = "BOOLEAN")
+    @ColumnDefault("false")
+    private Boolean messageAgree;
+
+    @Builder.Default
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
+    private StatusType status = StatusType.ACTIVE;
+
+    @OneToMany(mappedBy = "member", cascade = CascadeType.ALL)
+    private List<Food> memberTermList = new ArrayList<>();
+
+
+    @OneToOne(mappedBy = "member")
+    private MemberPassword memberPassword;
+
+
+
+
+
 }

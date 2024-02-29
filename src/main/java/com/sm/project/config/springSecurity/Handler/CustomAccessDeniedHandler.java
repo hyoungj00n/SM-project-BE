@@ -1,7 +1,7 @@
 package com.sm.project.config.springSecurity.Handler;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.sm.project.apiPayload.ApiResponse;
+import com.sm.project.apiPayload.ResponseDTO;
 import com.sm.project.apiPayload.code.status.ErrorStatus;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -28,7 +28,7 @@ public class CustomAccessDeniedHandler implements AccessDeniedHandler {
         response.setStatus(HttpStatus.UNAUTHORIZED.value());
         response.setContentType(MediaType.APPLICATION_JSON_VALUE);
         response.setCharacterEncoding("UTF-8");
-        String errorResponseJson = objectMapper.writeValueAsString(ApiResponse.onFailure(ErrorStatus.JWT_BAD_REQUEST.getCode(), ErrorStatus.JWT_BAD_REQUEST.getMessage(), ""));
+        String errorResponseJson = objectMapper.writeValueAsString(ResponseDTO.onFailure(ErrorStatus.JWT_BAD_REQUEST.getCode(), ErrorStatus.JWT_BAD_REQUEST.getMessage(), ""));
         response.getOutputStream().write(errorResponseJson.getBytes("UTF-8"));
     }
 }

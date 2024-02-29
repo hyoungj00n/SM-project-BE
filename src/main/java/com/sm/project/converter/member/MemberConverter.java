@@ -1,14 +1,23 @@
 package com.sm.project.converter.member;
 
-import com.sm.project.domain.member.JoinType;
+import com.sm.project.domain.enums.JoinType;
+import com.sm.project.web.dto.member.MemberResponseDTO;
 import com.sm.project.domain.member.Member;
 import com.sm.project.domain.member.MemberPassword;
 import com.sm.project.web.dto.member.MemberRequestDTO;
-import com.sm.project.web.dto.member.MemberResponseDTO;
 
 import javax.validation.constraints.Email;
 
+
 public class MemberConverter {
+
+    public static MemberResponseDTO.SocialJoinResultDTO toSocialJoinResultDTO(String phone, String email) {
+
+        return MemberResponseDTO.SocialJoinResultDTO.builder()
+                .phone(phone)
+                .email(email)
+                .build();
+    }
 
     public static Member toMember(MemberRequestDTO.JoinDTO request) {
         return Member.builder()
@@ -17,7 +26,7 @@ public class MemberConverter {
                 .phone(request.getPhone())
                 .infoAgree(request.getInfoAgree())
                 .messageAgree(request.getMessageAgree())
-                .joinType(JoinType.EMAIL)
+                .joinType(JoinType.GENERAL)
                 .build();
     }
 

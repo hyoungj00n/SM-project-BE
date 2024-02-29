@@ -45,6 +45,22 @@ jwt:
   token:
     secret: ${JWT_TOKEN_SECRET}
 
+
+oauth2:
+  kakao:
+    info-url: ${KAKAO_INFO_URL}
+    base-url: ${KAKAO_BASE_URL}
+    client-id: ${KAKAO_CLIENT_ID}
+    redirect-uri: ${KAKAO_REDIRECT_URI}
+
+feign:
+  client:
+    config:
+      default:
+        connectTimeout: 5000
+        readTimeout: 5000
+        loggerLevel: basic
+
 coolsms:
   api:
     key: ${API_KEY}
