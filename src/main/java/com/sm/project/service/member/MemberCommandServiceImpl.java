@@ -3,6 +3,7 @@ package com.sm.project.service.member;
 import com.sm.project.apiPayload.code.status.ErrorStatus;
 import com.sm.project.apiPayload.exception.handler.MemberHandler;
 import com.sm.project.converter.member.MemberConverter;
+import com.sm.project.coolsms.RedisUtil;
 import com.sm.project.coolsms.SmsUtil;
 import com.sm.project.domain.member.Member;
 import com.sm.project.domain.member.MemberPassword;
@@ -24,10 +25,13 @@ public class MemberCommandServiceImpl implements MemberCommandService{
     private final MemberPasswordRepository memberPasswordRepository;
     private final BCryptPasswordEncoder encoder;
     private final SmsUtil smsUtil;
+    private final RedisUtil redisUtil;
     private final MemberQueryService memberQueryService;
 
     @Transactional
     public Member joinMember(MemberRequestDTO.JoinDTO request) {
+        verifySms(request.getPhone(), request.getCertificationCode()); //인증코드 검사
+
         if (memberRepository.findByEmail(request.getEmail()).isPresent()) { //이메일 중복 검사
             throw new MemberHandler(ErrorStatus.MEMBER_ALREADY_JOIN);
         }
@@ -47,6 +51,20 @@ public class MemberCommandServiceImpl implements MemberCommandService{
         smsUtil.sendOne(to, vertificationCode); //인증문자 전송
 
         //redis에 저장하는 코드
+        redisUtil.createSmsCertification(to, vertificationCode);
+    }
+
+    @Override
+    public void verifySms(String phone, String certificationCode) {
+        if (isVerify(phone, certificationCode)) {
+            throw new MemberHandler(ErrorStatus.MEMBER_VERIFY_FAILURE);
+        }
+        redisUtil.removeSmsCertification(phone);
+    }
+
+    @Override
+    public boolean isVerify(String phone, String certificationCode) {
+        return !(redisUtil.hasKey(phone) && redisUtil.getSmsCertification(phone).equals(certificationCode));
     }
 
     @Transactional

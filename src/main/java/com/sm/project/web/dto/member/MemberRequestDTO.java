@@ -41,6 +41,10 @@ public class MemberRequestDTO {
 
         Boolean infoAgree;
         Boolean messageAgree;
+
+        //인증번호
+        @NotBlank(message = "인증번호는 필수 입력값입니다.")
+        String certificationCode;
     }
 
     @Getter

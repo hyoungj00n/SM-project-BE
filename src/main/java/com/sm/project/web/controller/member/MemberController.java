@@ -20,6 +20,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
@@ -64,6 +65,8 @@ public class MemberController {
             @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "COMMON200", description = "성공입니다."),
             @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "MEMBER4004", description = "이미 가입된 회원입니다.",
                     content = @Content(schema = @Schema(implementation = ErrorReasonDTO.class))),
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "MEMBER4006", description = "인증 번호가 일치하지 않습니다.",
+                    content = @Content(schema = @Schema(implementation = ErrorReasonDTO.class))),
     })
     public ResponseDTO<MemberResponseDTO.JoinResultDTO> join(@RequestBody @Valid MemberRequestDTO.JoinDTO request) {
         Member newMember = memberCommandService.joinMember(request);
@@ -89,7 +92,7 @@ public class MemberController {
         return ResponseDTO.onSuccess("인증문자 전송 성공");
     }
 
-    /*@PostMapping("/password")
+    @PostMapping("/password")
     @Operation(summary = "비밀번호 재설정 API", description = "비밀번호 찾기 페이지에서 비밀번호를 재설정하는 API입니다.")
     @ApiResponses({
             @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "MEMBER4001", description = "해당 회원을 찾을 수 없습니다.",
@@ -100,7 +103,7 @@ public class MemberController {
     public ResponseDTO<?> resetPassword(@RequestParam Long memberId, @RequestBody MemberRequestDTO.PasswordDTO request) {
         memberCommandService.resetPassword(memberId, request);
         return ResponseDTO.onSuccess("비밀번호 재설정 성공");
-    }*/
+    }
 
 
 }

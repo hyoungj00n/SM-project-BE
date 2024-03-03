@@ -8,6 +8,9 @@ public interface MemberCommandService {
     public Member joinMember(MemberRequestDTO.JoinDTO request);
 
     public void sendSms(MemberRequestDTO.SmsDTO smsDTO);
+    public void verifySms(String phone, String certificationCode);
+
+    public boolean isVerify(String phone, String certificationCode);
 
     public void resetPassword(Long memberId, MemberRequestDTO.PasswordDTO request);
 }
