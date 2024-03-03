@@ -8,4 +8,6 @@ public interface MemberCommandService {
     public Member joinMember(MemberRequestDTO.JoinDTO request);
 
     public void sendSms(MemberRequestDTO.SmsDTO smsDTO);
+
+    public void resetPassword(Long memberId, MemberRequestDTO.PasswordDTO request);
 }

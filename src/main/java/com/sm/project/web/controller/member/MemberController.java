@@ -38,7 +38,7 @@ public class MemberController {
     private final MemberQueryService memberQueryService;
 
     @GetMapping("/test")
-    public ResponseEntity<?> test(){
+    public ResponseEntity<?> test() {
         return ResponseEntity.ok().body("성공");
     }
 
@@ -62,7 +62,7 @@ public class MemberController {
     @Operation(summary = "회원가입 API", description = "이메일을 통해 회원가입하는 API입니다.")
     @ApiResponses({
             @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "COMMON200", description = "성공입니다."),
-            @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "MEMBER4002", description = "이미 가입된 회원입니다.",
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "MEMBER4004", description = "이미 가입된 회원입니다.",
                     content = @Content(schema = @Schema(implementation = ErrorReasonDTO.class))),
     })
     public ResponseDTO<MemberResponseDTO.JoinResultDTO> join(@RequestBody @Valid MemberRequestDTO.JoinDTO request) {
@@ -70,28 +70,37 @@ public class MemberController {
         return ResponseDTO.of(SuccessStatus._OK, MemberConverter.toJoinResultDTO(newMember));
     }
 
-    @GetMapping("/email")
+    @PostMapping("/email")
     @Operation(summary = "이메일 찾기 API", description = "닉네임과 전화번호로 이메일을 찾는 API입니다.")
     @ApiResponses({
             @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "COMMON200", description = "성공입니다."),
             @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "MEMBER4001", description = "해당 회원을 찾을 수 없습니다.",
                     content = @Content(schema = @Schema(implementation = ErrorReasonDTO.class))),
     })
-    @Parameters({
-            @Parameter(name = "nickname", description = "회원의 닉네임을 입력하세요."),
-            @Parameter(name = "phone", description = "회원의 전화번호를 입력하세요.")
-    })
-    public ResponseDTO<MemberResponseDTO.EmailResultDTO> findEmail(@RequestParam String nickname, @RequestParam String phone) {
-        Member member = memberQueryService.findEmail(nickname, phone);
+    public ResponseDTO<MemberResponseDTO.EmailResultDTO> findEmail(@RequestBody @Valid MemberRequestDTO.FindEmailDTO request) {
+        Member member = memberQueryService.findEmail(request.getNickname(), request.getPhone());
         return ResponseDTO.of(SuccessStatus._OK, MemberConverter.toEmailResultDTO(member));
     }
 
     @PostMapping("/send")
     @Operation(summary = "본인인증 문자 전송 API", description = "본인인증을 위한 인증번호 문자를 보내는 API입니다.")
-    public ResponseDTO sendSMS(@RequestBody MemberRequestDTO.SmsDTO smsDTO) {
-        memberCommandService.sendSms(smsDTO);
+    public ResponseDTO sendSMS(@RequestBody MemberRequestDTO.SmsDTO request) {
+        memberCommandService.sendSms(request);
         return ResponseDTO.onSuccess("인증문자 전송 성공");
     }
+
+    /*@PostMapping("/password")
+    @Operation(summary = "비밀번호 재설정 API", description = "비밀번호 찾기 페이지에서 비밀번호를 재설정하는 API입니다.")
+    @ApiResponses({
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "MEMBER4001", description = "해당 회원을 찾을 수 없습니다.",
+                    content = @Content(schema = @Schema(implementation = ErrorReasonDTO.class))),
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "MEMBER4005", description = "재설정한 비밀번호가 서로 다릅니다.",
+                    content = @Content(schema = @Schema(implementation = ErrorReasonDTO.class)))
+    })
+    public ResponseDTO<?> resetPassword(@RequestParam Long memberId, @RequestBody MemberRequestDTO.PasswordDTO request) {
+        memberCommandService.resetPassword(memberId, request);
+        return ResponseDTO.onSuccess("비밀번호 재설정 성공");
+    }*/
 
 
 }

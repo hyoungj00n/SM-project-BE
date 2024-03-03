@@ -10,6 +10,7 @@ import com.sm.project.repository.member.MemberPasswordRepository;
 import com.sm.project.repository.member.MemberRepository;
 import com.sm.project.web.dto.member.MemberRequestDTO;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -21,8 +22,9 @@ public class MemberCommandServiceImpl implements MemberCommandService{
 
     private final MemberRepository memberRepository;
     private final MemberPasswordRepository memberPasswordRepository;
-    private final PasswordEncoder encoder;
+    private final BCryptPasswordEncoder encoder;
     private final SmsUtil smsUtil;
+    private final MemberQueryService memberQueryService;
 
     @Transactional
     public Member joinMember(MemberRequestDTO.JoinDTO request) {
@@ -45,5 +47,17 @@ public class MemberCommandServiceImpl implements MemberCommandService{
         smsUtil.sendOne(to, vertificationCode); //인증문자 전송
 
         //redis에 저장하는 코드
+    }
+
+    @Transactional
+    public void resetPassword(Long memberId, MemberRequestDTO.PasswordDTO request) {
+        Member member = memberQueryService.findMemberById(memberId).orElseThrow(() -> new MemberHandler(ErrorStatus.MEMBER_NOT_FOUND));
+
+        if (request.getNewPassword().equals(request.getPasswordCheck())) { //새비밀번호 일치한지 확인
+            member.getMemberPassword().setPassword(encoder.encode(request.getNewPassword()));
+
+        } else {
+            throw new MemberHandler(ErrorStatus.MEMBER_PASSWORD_MISMATCH);
+        }
     }
 }
