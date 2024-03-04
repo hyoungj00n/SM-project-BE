@@ -6,15 +6,18 @@ import com.sm.project.converter.member.MemberConverter;
 import com.sm.project.coolsms.RedisUtil;
 import com.sm.project.coolsms.SmsUtil;
 import com.sm.project.domain.member.Member;
-import com.sm.project.domain.member.MemberPassword;
+import com.sm.project.service.mail.MailService;
 import com.sm.project.repository.member.MemberPasswordRepository;
 import com.sm.project.repository.member.MemberRepository;
 import com.sm.project.web.dto.member.MemberRequestDTO;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
-import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import javax.mail.MessagingException;
+import java.io.UnsupportedEncodingException;
+import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
@@ -27,6 +30,7 @@ public class MemberCommandServiceImpl implements MemberCommandService{
     private final SmsUtil smsUtil;
     private final RedisUtil redisUtil;
     private final MemberQueryService memberQueryService;
+    private final MailService mailService;
 
     @Transactional
     public Member joinMember(MemberRequestDTO.JoinDTO request) {
@@ -67,6 +71,17 @@ public class MemberCommandServiceImpl implements MemberCommandService{
         return !(redisUtil.hasKey(phone) && redisUtil.getSmsCertification(phone).equals(certificationCode));
     }
 
+    @Override
+    @Transactional
+    public void sendEmail(MemberRequestDTO.FindPasswordDTO request) throws MessagingException, UnsupportedEncodingException {
+        Member member = memberQueryService.findByEmail(request.getEmail()); //가입된 메일인지 검사. null이면 에러발생
+
+        String resetToken = UUID.randomUUID().toString();
+        member.setResetToken(resetToken);
+        mailService.sendResetPwdEmail(member.getEmail(), resetToken);
+    }
+
+    @Override
     @Transactional
     public void resetPassword(Long memberId, MemberRequestDTO.PasswordDTO request) {
         Member member = memberQueryService.findMemberById(memberId).orElseThrow(() -> new MemberHandler(ErrorStatus.MEMBER_NOT_FOUND));

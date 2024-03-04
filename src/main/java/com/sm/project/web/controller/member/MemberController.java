@@ -1,6 +1,7 @@
 package com.sm.project.web.controller.member;
 
 import com.sm.project.apiPayload.ResponseDTO;
+import com.sm.project.service.mail.MailService;
 import com.sm.project.service.member.MemberService;
 import com.sm.project.web.dto.member.MemberRequestDTO;
 import com.sm.project.web.dto.member.MemberResponseDTO;
@@ -11,8 +12,6 @@ import com.sm.project.converter.member.MemberConverter;
 import com.sm.project.domain.member.Member;
 import com.sm.project.service.member.MemberCommandService;
 import com.sm.project.service.member.MemberQueryService;
-import io.swagger.v3.oas.annotations.Parameter;
-import io.swagger.v3.oas.annotations.Parameters;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
@@ -20,11 +19,12 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.Authentication;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
+import javax.mail.MessagingException;
 import javax.validation.Valid;
+import java.io.UnsupportedEncodingException;
 
 @RestController
 @Slf4j
@@ -37,6 +37,7 @@ public class MemberController {
     private final MemberService memberService;
     private final MemberCommandService memberCommandService;
     private final MemberQueryService memberQueryService;
+    private final MailService mailService;
 
     @GetMapping("/test")
     public ResponseEntity<?> test() {
@@ -90,6 +91,17 @@ public class MemberController {
     public ResponseDTO sendSMS(@RequestBody MemberRequestDTO.SmsDTO request) {
         memberCommandService.sendSms(request);
         return ResponseDTO.onSuccess("인증문자 전송 성공");
+    }
+
+    @PostMapping("/password/send")
+    @Operation(summary = "비빌번호 찾기 이메일 전송 API", description = "비밀번호를 찾기 위한 인증링크 이메일을 전송하는 API입니다.")
+    @ApiResponses({
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "MEMBER4001", description = "해당 회원을 찾을 수 없습니다.",
+                    content = @Content(schema = @Schema(implementation = ErrorReasonDTO.class))),
+    })
+    public ResponseDTO sendEmail(@RequestBody @Valid MemberRequestDTO.FindPasswordDTO request) throws MessagingException, UnsupportedEncodingException {
+        memberCommandService.sendEmail(request);
+        return ResponseDTO.onSuccess("메일 전송 성공");
     }
 
     @PostMapping("/password")

@@ -27,6 +27,22 @@ spring:
   redis:
     host: localhost
     port: 6379
+  mail:
+    host: smtp.gmail.com
+    port: 587
+    username: refrigerator.fixer@gmail.com
+    password: ${MAIL_PASSWORD}
+    properties:
+      mail:
+        smtp:
+          auth: true
+          starttls:
+            enable: true
+        debug: true
+        mime:
+          charset: UTF-8
+        transport:
+          protocol: smtp
 
 
 logging:

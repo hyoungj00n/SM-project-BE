@@ -3,6 +3,9 @@ package com.sm.project.service.member;
 import com.sm.project.domain.member.Member;
 import com.sm.project.web.dto.member.MemberRequestDTO;
 
+import javax.mail.MessagingException;
+import java.io.UnsupportedEncodingException;
+
 public interface MemberCommandService {
 
     public Member joinMember(MemberRequestDTO.JoinDTO request);
@@ -11,6 +14,7 @@ public interface MemberCommandService {
     public void verifySms(String phone, String certificationCode);
 
     public boolean isVerify(String phone, String certificationCode);
+    public void sendEmail(MemberRequestDTO.FindPasswordDTO request) throws MessagingException, UnsupportedEncodingException;
 
     public void resetPassword(Long memberId, MemberRequestDTO.PasswordDTO request);
 }
