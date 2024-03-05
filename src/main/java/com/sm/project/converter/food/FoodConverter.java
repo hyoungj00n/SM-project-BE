@@ -61,7 +61,7 @@ public class FoodConverter {
                 .images(imageList)
                 .timestamp(System.currentTimeMillis())
                 .version("V2")
-                .enableTableDetection(true)
+                .enableTableDetection(false)
                 .build();
     }
 }
