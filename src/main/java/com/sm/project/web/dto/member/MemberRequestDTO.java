@@ -54,8 +54,10 @@ public class MemberRequestDTO {
 
     @Getter
     public static class FindEmailDTO {
-        String nickname;
+        @NotBlank(message = "전화번호는 필수 입력값입니다.")
         String phone;
+        @NotBlank(message = "인증번호는 필수 입력값입니다.")
+        String certificationCode;
     }
 
     @Getter

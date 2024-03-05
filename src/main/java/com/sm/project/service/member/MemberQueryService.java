@@ -21,8 +21,8 @@ public class MemberQueryService {
         return memberRepository.findById(id);
     }
 
-    public Member findEmail(String nickname, String phone) {
-        return memberRepository.findByNicknameAndPhone(nickname, phone).orElseThrow(
+    public Member findEmail(String phone) {
+        return memberRepository.findByPhone(phone).orElseThrow(
                 () -> new MemberHandler(ErrorStatus.MEMBER_NOT_FOUND));
     }
 

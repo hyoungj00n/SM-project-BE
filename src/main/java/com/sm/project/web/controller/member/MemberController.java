@@ -94,11 +94,14 @@ public class MemberController {
     @Operation(summary = "이메일 찾기 API", description = "닉네임과 전화번호로 이메일을 찾는 API입니다.")
     @ApiResponses({
             @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "COMMON200", description = "성공입니다."),
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "MEMBER4006", description = "인증번호가 일치하지 않습니다.",
+                    content = @Content(schema = @Schema(implementation = ErrorReasonDTO.class))),
             @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "MEMBER4001", description = "해당 회원을 찾을 수 없습니다.",
                     content = @Content(schema = @Schema(implementation = ErrorReasonDTO.class))),
     })
     public ResponseDTO<MemberResponseDTO.EmailResultDTO> findEmail(@RequestBody @Valid MemberRequestDTO.FindEmailDTO request) {
-        Member member = memberQueryService.findEmail(request.getNickname(), request.getPhone());
+        memberCommandService.verifySms(request.getPhone(), request.getCertificationCode());
+        Member member = memberQueryService.findEmail(request.getPhone());
         return ResponseDTO.of(SuccessStatus._OK, MemberConverter.toEmailResultDTO(member));
     }
 
