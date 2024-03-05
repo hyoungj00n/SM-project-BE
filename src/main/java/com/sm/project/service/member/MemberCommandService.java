@@ -9,6 +9,7 @@ import java.io.UnsupportedEncodingException;
 public interface MemberCommandService {
 
     public Member joinMember(MemberRequestDTO.JoinDTO request);
+    public boolean isDuplicate(MemberRequestDTO.NicknameDTO request);
 
     public void sendSms(MemberRequestDTO.SmsDTO smsDTO);
     public void verifySms(String phone, String certificationCode);

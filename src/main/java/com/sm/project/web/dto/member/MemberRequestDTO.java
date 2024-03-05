@@ -2,10 +2,7 @@ package com.sm.project.web.dto.member;
 
 import lombok.*;
 
-import javax.validation.constraints.Email;
-import javax.validation.constraints.NotBlank;
-import javax.validation.constraints.NotEmpty;
-import javax.validation.constraints.Pattern;
+import javax.validation.constraints.*;
 import java.time.LocalDate;
 
 public class MemberRequestDTO {
@@ -35,6 +32,7 @@ public class MemberRequestDTO {
         String password;
 
         @NotBlank(message = "닉네임은 필수 입력값입니다.")
+        @Size(min = 2, max = 15)  //2~15자리
         String nickname;
 
         @NotBlank(message = "전화번호는 필수 입력값입니다.")
@@ -46,6 +44,12 @@ public class MemberRequestDTO {
         //인증번호
         @NotBlank(message = "인증번호는 필수 입력값입니다.")
         String certificationCode;
+    }
+
+    @Getter
+    public static class NicknameDTO {
+        @Size(min = 2, max = 15)  //2~15자리
+        String nickname;
     }
 
     @Getter

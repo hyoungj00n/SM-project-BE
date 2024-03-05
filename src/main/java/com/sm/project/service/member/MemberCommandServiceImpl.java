@@ -32,6 +32,7 @@ public class MemberCommandServiceImpl implements MemberCommandService{
     private final MemberQueryService memberQueryService;
     private final MailService mailService;
 
+    @Override
     @Transactional
     public Member joinMember(MemberRequestDTO.JoinDTO request) {
         verifySms(request.getPhone(), request.getCertificationCode()); //인증코드 검사
@@ -48,6 +49,13 @@ public class MemberCommandServiceImpl implements MemberCommandService{
         return newMember;
     }
 
+    @Override
+    public boolean isDuplicate(MemberRequestDTO.NicknameDTO request) {
+        Member member = memberRepository.findByNickname(request.getNickname());
+        return (member!=null);
+    }
+
+    @Override
     public void sendSms(MemberRequestDTO.SmsDTO smsDTO) {
         String to = smsDTO.getPhone();
         int randomNum = (int) (Math.random()*9000)+1000;

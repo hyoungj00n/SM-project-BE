@@ -1,6 +1,8 @@
 package com.sm.project.web.controller.member;
 
 import com.sm.project.apiPayload.ResponseDTO;
+import com.sm.project.apiPayload.code.status.ErrorStatus;
+import com.sm.project.apiPayload.exception.handler.MemberHandler;
 import com.sm.project.service.mail.MailService;
 import com.sm.project.service.member.MemberService;
 import com.sm.project.web.dto.member.MemberRequestDTO;
@@ -74,6 +76,20 @@ public class MemberController {
         return ResponseDTO.of(SuccessStatus._OK, MemberConverter.toJoinResultDTO(newMember));
     }
 
+    @PostMapping("/nickname")
+    @Operation(summary = "닉네임 중복 확인 API", description = "회원가입 시 회원이 입력한 닉네임의 중복 여부를 확인하는 API입니다.")
+    @ApiResponses({
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "COMMON200", description = "성공입니다."),
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "MEMBER4008", description = "이미 존재하는 닉네임입니다.",
+                    content = @Content(schema = @Schema(implementation = ErrorReasonDTO.class)))
+    })
+    public ResponseDTO checkNickname(@RequestBody @Valid MemberRequestDTO.NicknameDTO request) {
+        if (memberCommandService.isDuplicate(request)) {
+            throw new MemberHandler(ErrorStatus.MEMBER_NICKNAME_DUPLICATE);
+        }
+        return ResponseDTO.onSuccess("닉네임 중복이 아닙니다.");
+    }
+
     @PostMapping("/email")
     @Operation(summary = "이메일 찾기 API", description = "닉네임과 전화번호로 이메일을 찾는 API입니다.")
     @ApiResponses({
@@ -116,5 +132,4 @@ public class MemberController {
         memberCommandService.resetPassword(resetToken, request);
         return ResponseDTO.onSuccess("비밀번호 재설정 성공");
     }
-
 }
