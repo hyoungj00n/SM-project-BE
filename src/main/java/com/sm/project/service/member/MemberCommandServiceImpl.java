@@ -83,12 +83,12 @@ public class MemberCommandServiceImpl implements MemberCommandService{
 
     @Override
     @Transactional
-    public void resetPassword(Long memberId, MemberRequestDTO.PasswordDTO request) {
-        Member member = memberQueryService.findMemberById(memberId).orElseThrow(() -> new MemberHandler(ErrorStatus.MEMBER_NOT_FOUND));
+    public void resetPassword(String resetToken, MemberRequestDTO.PasswordDTO request) {
+        Member member = memberQueryService.findByResetToken(resetToken);
 
         if (request.getNewPassword().equals(request.getPasswordCheck())) { //새비밀번호 일치한지 확인
             member.getMemberPassword().setPassword(encoder.encode(request.getNewPassword()));
-
+            member.setResetToken(null); //재설정 토큰 다시 null로
         } else {
             throw new MemberHandler(ErrorStatus.MEMBER_PASSWORD_MISMATCH);
         }

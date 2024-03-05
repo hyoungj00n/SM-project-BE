@@ -16,5 +16,5 @@ public interface MemberCommandService {
     public boolean isVerify(String phone, String certificationCode);
     public void sendEmail(MemberRequestDTO.FindPasswordDTO request) throws MessagingException, UnsupportedEncodingException;
 
-    public void resetPassword(Long memberId, MemberRequestDTO.PasswordDTO request);
+    public void resetPassword(String resetToken, MemberRequestDTO.PasswordDTO request);
 }

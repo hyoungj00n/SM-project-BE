@@ -22,6 +22,7 @@ public enum ErrorStatus implements BaseErrorCode {
     MEMBER_ALREADY_JOIN(HttpStatus.BAD_REQUEST, "MEMBER4004", "이미 가입된 회원입니다."),
     MEMBER_PASSWORD_MISMATCH(HttpStatus.BAD_REQUEST, "MEMBER4005", "재설정한 비밀번호가 서로 다릅니다."),
     MEMBER_VERIFY_FAILURE(HttpStatus.BAD_REQUEST,"MEMBER4006", "인증번호가 일치하지 않습니다."),
+    MEMBER_WRONG_RESET_TOKEN(HttpStatus.BAD_REQUEST, "MEMBER4007", "재설정 토큰이 올바르지 않습니다."),
 
     //JWT
 

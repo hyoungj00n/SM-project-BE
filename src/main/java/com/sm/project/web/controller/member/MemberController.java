@@ -107,15 +107,14 @@ public class MemberController {
     @PostMapping("/password")
     @Operation(summary = "비밀번호 재설정 API", description = "비밀번호 찾기 페이지에서 비밀번호를 재설정하는 API입니다.")
     @ApiResponses({
-            @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "MEMBER4001", description = "해당 회원을 찾을 수 없습니다.",
-                    content = @Content(schema = @Schema(implementation = ErrorReasonDTO.class))),
             @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "MEMBER4005", description = "재설정한 비밀번호가 서로 다릅니다.",
+                    content = @Content(schema = @Schema(implementation = ErrorReasonDTO.class))),
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "MEMBER4007", description = "재설정 토큰이 올바르지 않습니다.(해당 회원을 찾을 수 없습니다.)",
                     content = @Content(schema = @Schema(implementation = ErrorReasonDTO.class)))
     })
-    public ResponseDTO<?> resetPassword(@RequestParam Long memberId, @RequestBody MemberRequestDTO.PasswordDTO request) {
-        memberCommandService.resetPassword(memberId, request);
+    public ResponseDTO<?> resetPassword(@RequestParam String resetToken, @RequestBody @Valid MemberRequestDTO.PasswordDTO request) {
+        memberCommandService.resetPassword(resetToken, request);
         return ResponseDTO.onSuccess("비밀번호 재설정 성공");
     }
-
 
 }
