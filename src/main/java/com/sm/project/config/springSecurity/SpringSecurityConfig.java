@@ -42,7 +42,13 @@ public class SpringSecurityConfig {
                         "/swagger-ui/**",
                         "/swagger-resources/**",
                         "/v3/api-docs/**",
-                        "/api/members/login"
+                        "/api/members/login",
+                        "/api/members/register",
+                        "/api/members/send",
+                        "/api/members/email",
+                        "/api/members/password/send",
+                        "/api/members/password",
+                        "/api/members/nickname"
                 );
     }
     @Bean

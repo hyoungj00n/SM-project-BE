@@ -30,4 +30,20 @@ public class MemberResponseDTO {
         String phone;
         String email;
     }
+
+    @Getter
+    @Builder
+    @NoArgsConstructor
+    @AllArgsConstructor
+    public static class JoinResultDTO {
+        Long memberId;
+    }
+
+    @Getter
+    @Builder
+    @NoArgsConstructor
+    @AllArgsConstructor
+    public static class EmailResultDTO {
+        String email;
+    }
 }

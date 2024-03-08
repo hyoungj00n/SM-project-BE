@@ -24,6 +24,25 @@ spring:
     multipart:
       max-file-size: 500MB
       max-request-size: 500MB
+  redis:
+    host: localhost
+    port: 6379
+  mail:
+    host: smtp.gmail.com
+    port: 587
+    username: ${MAIL_USERNAME}
+    password: ${MAIL_PASSWORD}
+    properties:
+      mail:
+        smtp:
+          auth: true
+          starttls:
+            enable: true
+        debug: true
+        mime:
+          charset: UTF-8
+        transport:
+          protocol: smtp
 
 
 logging:
@@ -60,3 +79,9 @@ feign:
         connectTimeout: 5000
         readTimeout: 5000
         loggerLevel: basic
+
+coolsms:
+  api:
+    key: ${API_KEY}
+    secret: ${API_SECRET}
+  senderNumber: ${SENDER_NUMBER}

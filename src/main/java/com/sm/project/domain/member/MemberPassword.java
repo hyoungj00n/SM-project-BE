@@ -23,4 +23,8 @@ public class MemberPassword extends BaseDateTimeEntity {
     @OneToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "member_id")
     private Member member;
+
+    public void setPassword(String password) {
+        this.password = password;
+    }
 }

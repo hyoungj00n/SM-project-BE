@@ -56,8 +56,9 @@ public class Member extends BaseDateTimeEntity {
     @OneToOne(mappedBy = "member")
     private MemberPassword memberPassword;
 
+    private String resetToken;
 
-
-
-
+    public void setResetToken(String resetToken) {
+        this.resetToken = resetToken;
+    }
 }
