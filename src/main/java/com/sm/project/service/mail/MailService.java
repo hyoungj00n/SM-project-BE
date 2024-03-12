@@ -1,6 +1,5 @@
 package com.sm.project.service.mail;
 
-import io.jsonwebtoken.UnsupportedJwtException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.mail.javamail.JavaMailSender;
@@ -15,7 +14,7 @@ import java.io.UnsupportedEncodingException;
 @RequiredArgsConstructor
 public class MailService {
     private final JavaMailSender mailSender;
-    @Value("${MAIL_USERNAME}")
+    @Value("${spring.mail.username}")
     private String fromMail;
     @Value("")
     private String url;
