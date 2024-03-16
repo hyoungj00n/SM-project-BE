@@ -66,14 +66,28 @@ public class MemberRequestDTO {
     }
 
     @Getter
-    public static class FindPasswordDTO {
+    public static class SendEmailDTO {
         @Email
         @NotEmpty(message = "이메일은 필수 입력값입니다.")
         private String email;
     }
 
     @Getter
+    public static class FindPassword {
+        @Email
+        @NotBlank(message = "이메일은 필수 입력값입니다.")
+        private String email;
+
+        @NotBlank(message = "인증코드는 필수 입력값입니다.")
+        private String certificationCode;
+    }
+
+    @Getter
     public static class PasswordDTO {
+        @Email
+        @NotBlank(message = "이메일은 필수 입력값입니다.")
+        private String email;
+
         @Pattern(regexp = "(?=.*[0-9])(?=.*[a-zA-Z])(?=.*\\W)(?=\\S+$).{8,16}", message = "비밀번호는 8~16자 영문, 숫자, 특수문자를 사용하세요.")
         private String newPassword;
         @Pattern(regexp = "(?=.*[0-9])(?=.*[a-zA-Z])(?=.*\\W)(?=\\S+$).{8,16}", message = "비밀번호는 8~16자 영문, 숫자, 특수문자를 사용하세요.")

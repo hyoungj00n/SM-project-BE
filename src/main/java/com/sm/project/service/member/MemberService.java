@@ -138,32 +138,45 @@ public class MemberService {
     }
 
     public void verifySms(String phone, String certificationCode) {
-        if (isVerify(phone, certificationCode)) {
+        if (isVerifySms(phone, certificationCode)) {
             throw new MemberHandler(ErrorStatus.MEMBER_VERIFY_FAILURE);
         }
         redisUtil.removeSmsCertification(phone);
     }
 
-    public boolean isVerify(String phone, String certificationCode) {
+    public boolean isVerifySms(String phone, String certificationCode) {
         return !(redisUtil.hasKey(phone) && redisUtil.getSmsCertification(phone).equals(certificationCode));
     }
 
     @Transactional
-    public void sendEmail(MemberRequestDTO.FindPasswordDTO request) throws MessagingException, UnsupportedEncodingException {
+    public void sendEmail(MemberRequestDTO.SendEmailDTO request) throws MessagingException, UnsupportedEncodingException {
         Member member = memberQueryService.findByEmail(request.getEmail()); //가입된 메일인지 검사. null이면 에러발생
 
-        String resetToken = UUID.randomUUID().toString();
-        member.setResetToken(resetToken);
-        mailService.sendResetPwdEmail(member.getEmail(), resetToken);
+        //랜덤 수 생성
+        int randomNum = (int) (Math.random()*9000)+1000;
+        String vertificationCode = String.valueOf(randomNum);
+        redisUtil.createEmailCertification(request.getEmail(), vertificationCode); //redis에 key:이메일, value:인증코드 저장
+
+        mailService.sendResetPwdEmail(member.getEmail(), vertificationCode);
+    }
+
+    public void verifyEmail(String email, String certificationCode) {  //인증 코드 검증 후 삭제
+        if (isVerifyEmail(email, certificationCode)) {
+            throw new MemberHandler(ErrorStatus.MEMBER_VERIFY_FAILURE);
+        }
+        redisUtil.removeEmailCertification(email);
+    }
+
+    public boolean isVerifyEmail(String email, String certificationCode) {  //이메일 인증 코드 검증
+        return !(redisUtil.hasKeyEmail(email) && redisUtil.getEmailCertification(email).equals(certificationCode));
     }
 
     @Transactional
-    public void resetPassword(String resetToken, MemberRequestDTO.PasswordDTO request) {
-        Member member = memberQueryService.findByResetToken(resetToken);
+    public void resetPassword(MemberRequestDTO.PasswordDTO request) {
+        Member member = memberQueryService.findByEmail(request.getEmail());
 
         if (request.getNewPassword().equals(request.getPasswordCheck())) { //새비밀번호 일치한지 확인
             member.getMemberPassword().setPassword(encoder.encode(request.getNewPassword()));
-            member.setResetToken(null); //재설정 토큰 다시 null로
         } else {
             throw new MemberHandler(ErrorStatus.MEMBER_PASSWORD_MISMATCH);
         }

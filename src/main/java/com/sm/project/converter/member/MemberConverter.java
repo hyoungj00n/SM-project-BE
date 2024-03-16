@@ -43,9 +43,9 @@ public class MemberConverter {
                 .build();
     }
 
-    public static MemberResponseDTO.EmailResultDTO toEmailResultDTO(Member member) {
+    public static MemberResponseDTO.EmailResultDTO toEmailResultDTO(String email) {
         return MemberResponseDTO.EmailResultDTO.builder()
-                .email(member.getEmail())
+                .email(email)
                 .build();
     }
 }

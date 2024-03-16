@@ -16,6 +16,7 @@ public class RedisUtil {
 
     private final StringRedisTemplate redisTemplate;
 
+    //문자 인증 관련
     public void createSmsCertification(String phone, String certificationNum) {
         redisTemplate.opsForValue()
                 .set(PREFIX + phone, certificationNum, Duration.ofSeconds(LIMIT_TIME));
@@ -31,5 +32,23 @@ public class RedisUtil {
 
     public boolean hasKey(String phone) {
         return redisTemplate.hasKey(PREFIX + phone);
+    }
+
+    //이메일 인증 관련
+    public void createEmailCertification(String email, String certificationCode) {
+        redisTemplate.opsForValue()
+                .set("email: " + email, certificationCode, Duration.ofSeconds(LIMIT_TIME));
+    }
+
+    public String getEmailCertification(String email) {
+        return redisTemplate.opsForValue().get("email: " + email);
+    }
+
+    public void removeEmailCertification(String email) {
+        redisTemplate.delete("email: " + email);
+    }
+
+    public boolean hasKeyEmail(String email) {
+        return redisTemplate.hasKey("email: " + email);
     }
 }
