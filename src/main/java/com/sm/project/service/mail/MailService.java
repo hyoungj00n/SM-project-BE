@@ -19,7 +19,7 @@ public class MailService {
     @Value("")
     private String url;
 
-    public void sendResetPwdEmail(String email, String resetToken) throws MessagingException, UnsupportedEncodingException {
+    public void sendResetPwdEmail(String email, String certificationCode) throws MessagingException, UnsupportedEncodingException {
         MimeMessage message = mailSender.createMimeMessage();
 
         message.addRecipients(MimeMessage.RecipientType.TO, email);  //보내는 대상
@@ -28,10 +28,10 @@ public class MailService {
         String content = "<div>"
                 + "<p> 안녕하세요. 냉장고 해결사 입니다.<p>"
                 + "<br>"
-                + "<p> 아래 링크를 클릭하면 인증이 완료되고, " + email +" 계정의 비밀번호를 재설정 할 수 있습니다.<p>"
+                + "<p> 아래 인증 코드를 앱에 입력하면 인증이 완료되고, " + email +" 계정의 비밀번호를 재설정 할 수 있습니다.<p>"
                 + "<p> 새로운 비밀번호로 재설정 해주세요. <p>"
                 + "<br>"
-                + "<a href='" + url + resetToken + "'>비밀번호 재설정 링크</a>"
+                + "<p> 인증코드: "+ certificationCode +"<P>"
                 + "<br>"
                 + "<p> 감사합니다. <p>"
                 + "</div>";

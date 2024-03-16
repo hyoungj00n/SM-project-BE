@@ -5,6 +5,8 @@ import com.sm.project.apiPayload.code.status.ErrorStatus;
 import com.sm.project.apiPayload.exception.handler.MemberHandler;
 import com.sm.project.config.springSecurity.TokenProvider;
 import com.sm.project.converter.member.MemberConverter;
+import com.sm.project.coolsms.RedisUtil;
+import com.sm.project.coolsms.SmsUtil;
 import com.sm.project.domain.member.Member;
 import com.sm.project.domain.member.MemberPassword;
 import com.sm.project.feignClient.dto.KakaoProfile;
@@ -14,6 +16,7 @@ import com.sm.project.feignClient.service.KakaoOauthService;
 import com.sm.project.redis.service.RedisService;
 import com.sm.project.repository.member.MemberPasswordRepository;
 import com.sm.project.repository.member.MemberRepository;
+import com.sm.project.service.mail.MailService;
 import com.sm.project.web.dto.member.MemberRequestDTO;
 import com.sm.project.web.dto.member.MemberResponseDTO;
 import lombok.RequiredArgsConstructor;
@@ -24,8 +27,11 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import javax.mail.MessagingException;
+import java.io.UnsupportedEncodingException;
 import java.util.Arrays;
 import java.util.Optional;
+import java.util.UUID;
 
 @Service
 @Slf4j
@@ -40,6 +46,10 @@ public class MemberService {
     private final MemberPasswordRepository memberPasswordRepository;
     private final KakaoOauthService kakaoOauthService;
     private final KakaoTokenFeignClient tokenClient;
+    private final SmsUtil smsUtil;
+    private final RedisUtil redisUtil;
+    private final MemberQueryService memberQueryService;
+    private final MailService mailService;
 
 
     @Value("${oauth2.kakao.client-id}")
@@ -96,6 +106,80 @@ public class MemberService {
         }
     }
 
+    @Transactional
+    public Member joinMember(MemberRequestDTO.JoinDTO request) {
+        verifySms(request.getPhone(), request.getCertificationCode()); //인증코드 검사
 
+        if (memberRepository.findByEmail(request.getEmail()).isPresent()) { //이메일 중복 검사
+            throw new MemberHandler(ErrorStatus.MEMBER_ALREADY_JOIN);
+        }
+        Member newMember = MemberConverter.toMember(request);
+        memberRepository.save(newMember);
+
+        //패스워드 해시처리.
+        String password = encoder.encode(request.getPassword());
+        memberPasswordRepository.save(MemberConverter.toMemberPassword(password, newMember));
+        return newMember;
+    }
+
+    public boolean isDuplicate(MemberRequestDTO.NicknameDTO request) {
+        Member member = memberRepository.findByNickname(request.getNickname());
+        return (member!=null);
+    }
+
+    public void sendSms(MemberRequestDTO.SmsDTO smsDTO) {
+        String to = smsDTO.getPhone();
+        int randomNum = (int) (Math.random()*9000)+1000;
+        String vertificationCode = String.valueOf(randomNum);
+        smsUtil.sendOne(to, vertificationCode); //인증문자 전송
+
+        //redis에 저장하는 코드
+        redisUtil.createSmsCertification(to, vertificationCode);
+    }
+
+    public void verifySms(String phone, String certificationCode) {
+        if (isVerifySms(phone, certificationCode)) {
+            throw new MemberHandler(ErrorStatus.MEMBER_VERIFY_FAILURE);
+        }
+        redisUtil.removeSmsCertification(phone);
+    }
+
+    public boolean isVerifySms(String phone, String certificationCode) {
+        return !(redisUtil.hasKey(phone) && redisUtil.getSmsCertification(phone).equals(certificationCode));
+    }
+
+    @Transactional
+    public void sendEmail(MemberRequestDTO.SendEmailDTO request) throws MessagingException, UnsupportedEncodingException {
+        Member member = memberQueryService.findByEmail(request.getEmail()); //가입된 메일인지 검사. null이면 에러발생
+
+        //랜덤 수 생성
+        int randomNum = (int) (Math.random()*9000)+1000;
+        String vertificationCode = String.valueOf(randomNum);
+        redisUtil.createEmailCertification(request.getEmail(), vertificationCode); //redis에 key:이메일, value:인증코드 저장
+
+        mailService.sendResetPwdEmail(member.getEmail(), vertificationCode);
+    }
+
+    public void verifyEmail(String email, String certificationCode) {  //인증 코드 검증 후 삭제
+        if (isVerifyEmail(email, certificationCode)) {
+            throw new MemberHandler(ErrorStatus.MEMBER_VERIFY_FAILURE);
+        }
+        redisUtil.removeEmailCertification(email);
+    }
+
+    public boolean isVerifyEmail(String email, String certificationCode) {  //이메일 인증 코드 검증
+        return !(redisUtil.hasKeyEmail(email) && redisUtil.getEmailCertification(email).equals(certificationCode));
+    }
+
+    @Transactional
+    public void resetPassword(MemberRequestDTO.PasswordDTO request) {
+        Member member = memberQueryService.findByEmail(request.getEmail());
+
+        if (request.getNewPassword().equals(request.getPasswordCheck())) { //새비밀번호 일치한지 확인
+            member.getMemberPassword().setPassword(encoder.encode(request.getNewPassword()));
+        } else {
+            throw new MemberHandler(ErrorStatus.MEMBER_PASSWORD_MISMATCH);
+        }
+    }
 
 }

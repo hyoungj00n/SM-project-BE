@@ -12,7 +12,6 @@ import com.sm.project.apiPayload.code.ErrorReasonDTO;
 import com.sm.project.apiPayload.code.status.SuccessStatus;
 import com.sm.project.converter.member.MemberConverter;
 import com.sm.project.domain.member.Member;
-import com.sm.project.service.member.MemberCommandService;
 import com.sm.project.service.member.MemberQueryService;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -37,7 +36,6 @@ import java.io.UnsupportedEncodingException;
 public class MemberController {
 
     private final MemberService memberService;
-    private final MemberCommandService memberCommandService;
     private final MemberQueryService memberQueryService;
     private final MailService mailService;
 
@@ -72,7 +70,7 @@ public class MemberController {
                     content = @Content(schema = @Schema(implementation = ErrorReasonDTO.class))),
     })
     public ResponseDTO<MemberResponseDTO.JoinResultDTO> join(@RequestBody @Valid MemberRequestDTO.JoinDTO request) {
-        Member newMember = memberCommandService.joinMember(request);
+        Member newMember = memberService.joinMember(request);
         return ResponseDTO.of(SuccessStatus._OK, MemberConverter.toJoinResultDTO(newMember));
     }
 
@@ -84,7 +82,7 @@ public class MemberController {
                     content = @Content(schema = @Schema(implementation = ErrorReasonDTO.class)))
     })
     public ResponseDTO checkNickname(@RequestBody @Valid MemberRequestDTO.NicknameDTO request) {
-        if (memberCommandService.isDuplicate(request)) {
+        if (memberService.isDuplicate(request)) {
             throw new MemberHandler(ErrorStatus.MEMBER_NICKNAME_DUPLICATE);
         }
         return ResponseDTO.onSuccess("닉네임 중복이 아닙니다.");
@@ -100,39 +98,51 @@ public class MemberController {
                     content = @Content(schema = @Schema(implementation = ErrorReasonDTO.class))),
     })
     public ResponseDTO<MemberResponseDTO.EmailResultDTO> findEmail(@RequestBody @Valid MemberRequestDTO.FindEmailDTO request) {
-        memberCommandService.verifySms(request.getPhone(), request.getCertificationCode());
+        memberService.verifySms(request.getPhone(), request.getCertificationCode());
         Member member = memberQueryService.findEmail(request.getPhone());
-        return ResponseDTO.of(SuccessStatus._OK, MemberConverter.toEmailResultDTO(member));
+        return ResponseDTO.of(SuccessStatus._OK, MemberConverter.toEmailResultDTO(member.getEmail()));
     }
 
     @PostMapping("/send")
     @Operation(summary = "본인인증 문자 전송 API", description = "본인인증을 위한 인증번호 문자를 보내는 API입니다.")
     public ResponseDTO sendSMS(@RequestBody MemberRequestDTO.SmsDTO request) {
-        memberCommandService.sendSms(request);
+        memberService.sendSms(request);
         return ResponseDTO.onSuccess("인증문자 전송 성공");
     }
 
     @PostMapping("/password/send")
-    @Operation(summary = "비빌번호 찾기 이메일 전송 API", description = "비밀번호를 찾기 위한 인증링크 이메일을 전송하는 API입니다.")
+    @Operation(summary = "비빌번호 찾기 이메일 전송 API", description = "비밀번호를 찾기 위한 인증코드 이메일을 전송하는 API입니다.")
     @ApiResponses({
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "COMMON200", description = "성공입니다."),
             @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "MEMBER4001", description = "해당 회원을 찾을 수 없습니다.",
                     content = @Content(schema = @Schema(implementation = ErrorReasonDTO.class))),
     })
-    public ResponseDTO sendEmail(@RequestBody @Valid MemberRequestDTO.FindPasswordDTO request) throws MessagingException, UnsupportedEncodingException {
-        memberCommandService.sendEmail(request);
-        return ResponseDTO.onSuccess("메일 전송 성공");
+    public ResponseDTO<?> sendEmail(@RequestBody @Valid MemberRequestDTO.SendEmailDTO request) throws MessagingException, UnsupportedEncodingException {
+        memberService.sendEmail(request);
+        return ResponseDTO.of(SuccessStatus._OK, "메일 전송 성공");
     }
 
     @PostMapping("/password")
-    @Operation(summary = "비밀번호 재설정 API", description = "비밀번호 찾기 페이지에서 비밀번호를 재설정하는 API입니다.")
+    @Operation(summary = "비밀번호 찾기 API", description = "비밀번호 찾기 페이지에서 인증코드가 맞는지 검사하는 API입니다. 해당 이메일을 응답으로 줍니다.")
     @ApiResponses({
-            @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "MEMBER4005", description = "재설정한 비밀번호가 서로 다릅니다.",
-                    content = @Content(schema = @Schema(implementation = ErrorReasonDTO.class))),
-            @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "MEMBER4007", description = "재설정 토큰이 올바르지 않습니다.(해당 회원을 찾을 수 없습니다.)",
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "COMMON200", description = "성공입니다."),
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "MEMBER4006", description = "인증번호가 일치하지 않습니다.",
                     content = @Content(schema = @Schema(implementation = ErrorReasonDTO.class)))
     })
-    public ResponseDTO<?> resetPassword(@RequestParam String resetToken, @RequestBody @Valid MemberRequestDTO.PasswordDTO request) {
-        memberCommandService.resetPassword(resetToken, request);
-        return ResponseDTO.onSuccess("비밀번호 재설정 성공");
+    public ResponseDTO<MemberResponseDTO.EmailResultDTO> findPassword(@RequestBody @Valid MemberRequestDTO.FindPassword request) {
+        memberService.verifyEmail(request.getEmail(), request.getCertificationCode()); //인증 코드 검사
+        return ResponseDTO.of(SuccessStatus._OK, MemberConverter.toEmailResultDTO(request.getEmail()));
+    }
+
+    @PostMapping("/password/reset")
+    @Operation(summary = "비밀번호 재설정 API", description = "비밀번호 찾기 이후 재설정 페이지에서 비밀번호를 재설정하는 API입니다.")
+    @ApiResponses({
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "COMMON200", description = "성공입니다."),
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "MEMBER4005", description = "재설정한 비밀번호가 서로 다릅니다.",
+                    content = @Content(schema = @Schema(implementation = ErrorReasonDTO.class))),
+    })
+    public ResponseDTO<?> resetPassword(@RequestBody @Valid MemberRequestDTO.PasswordDTO request) {
+        memberService.resetPassword(request);
+        return ResponseDTO.of(SuccessStatus._OK, "비밀번호 재설정 성공");
     }
 }
